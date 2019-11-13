@@ -5,6 +5,7 @@
 #include <QCommandLineParser>
 
 #include "Daemon.h"
+#include "Database.h"
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +39,9 @@ int main(int argc, char *argv[])
         }
         daemon->setPort(customPort);
     }
+
+    // [HV] Testing purposes only (For now)
+    new Database();
 
     QTimer::singleShot(0, daemon, &Daemon::start);
 

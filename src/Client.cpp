@@ -8,6 +8,7 @@
 
 #include "Client.h"
 #include "Daemon.h"
+#include "RequestFactory.h"
 
 static QLoggingCategory logClient("Client", QtCriticalMsg);
 
@@ -81,14 +82,44 @@ void Client::request(const QString &dataIn)
     }
 
     const auto name = value.toString();
-    qDebug() << "Name of request: " << name;
-
-    QVariantMap request = object.toVariantMap();
-
-    if (!request.contains(dataKey)) {
-        qCCritical(logClient) << "Request contains no data " << request;
+    const auto factory = RequestFactory::instance();
+    auto request = factory->createRequest(name, this);
+    if (!request) {
+        qCCritical(logClient) << "Unknown request:" << name;
         mSocket->close(QWebSocketProtocol::CloseCodeDatatypeNotSupported);
         return;
+    }
+
+    connect(mSocket, &QWebSocket::binaryMessageReceived, request,
+            &Request::data);
+
+    connect(request, &Request::completed, [=](const QVariantMap &result) {
+        const auto object = QJsonObject::fromVariantMap(result);
+        const auto document = QJsonDocument(object);
+        mSocket->sendTextMessage(
+            QString(document.toJson(QJsonDocument::Compact)));
+        request->deleteLater();
+    });
+
+    connect(request, &Request::progress, [=](const QVariantMap &result) {
+        const auto object = QJsonObject::fromVariantMap(result);
+        const auto document = QJsonDocument(object);
+        mSocket->sendTextMessage(
+                    QString(document.toJson(QJsonDocument::Compact)));
+    });
+
+    connect(request, &Request::error, [=](const QVariantMap &result) {
+        const auto object = QJsonObject::fromVariantMap(result);
+        const auto document = QJsonDocument(object);
+        mSocket->sendTextMessage(
+            QString(document.toJson(QJsonDocument::Compact)));
+        request->deleteLater();
+    });
+
+    if (!request->exec(object.toVariantMap())) {
+        mSocket->close(
+            QWebSocketProtocol::CloseCodeAbnormalDisconnection,
+            QStringLiteral("Internal error, request-handler failed."));
     }
 }
 

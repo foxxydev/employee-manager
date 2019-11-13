@@ -5,6 +5,9 @@
 #include "Client.h"
 #include "Daemon.h"
 
+#include "Employee.h"
+#include "RequestFactory.h"
+
 static QLoggingCategory logDaemon("Daemon", QtCriticalMsg);
 
 /**
@@ -16,6 +19,9 @@ Daemon::Daemon(QObject *parent)
     : QObject(parent), mPort(8080), mWebSocket(nullptr)
 {
     qCDebug(logDaemon) << "Daemon started on port:" << mPort;
+
+    auto factory = RequestFactory::instance();
+    factory->registerRequest(new Employee());
 }
 
 /**
@@ -89,7 +95,6 @@ void Daemon::start()
 
 void Daemon::clientConnected()
 {
-    qCDebug(logDaemon) << "New client connected! Yay! ^_^ ";
     auto socket = mWebSocket->nextPendingConnection();
     if (socket) {
         new Client(socket, this);
