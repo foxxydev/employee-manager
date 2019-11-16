@@ -1,5 +1,6 @@
 #ifndef SMTP_H
 #define SMTP_H
+
 #include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QSslSocket>
 #include <QString>
@@ -10,7 +11,6 @@
 class Smtp : public QObject
 {
     Q_OBJECT
-
 
 public:
     Smtp( const QString &user = "employeemanagerapp@gmail.com", const QString &pass = "baumbaum$4",
@@ -44,6 +44,6 @@ private:
     int port;
     enum states{Tls, HandShake ,Auth,User,Pass,Rcpt,Mail,Data,Init,Body,Quit,Close};
     int state;
-
 };
-#endif
+
+#endif // SMTP_H

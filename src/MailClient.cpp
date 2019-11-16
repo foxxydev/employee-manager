@@ -5,7 +5,6 @@
 MailClient::MailClient(QObject *parent)
     :QObject(parent)
 {
-
 }
 
 bool MailClient::sendMail(const QString &from, const QString &to, const QString &subj, const QString &msg)
@@ -13,18 +12,18 @@ bool MailClient::sendMail(const QString &from, const QString &to, const QString 
     Smtp* smtp = new Smtp();
     connect(smtp, SIGNAL(status(QString)), this, SLOT(mailSent(QString)));
 
-    if (smtp->sendMail(from, to, subj, msg)) {
-        return true;
+    if (!smtp->sendMail(from, to, subj, msg)) {
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 bool MailClient::mailSent(QString status)
 {
-    if(status == "Message sent") {
-        return true;
+    if (status != "Message sent") {
+        return false;
     }
 
-    return false;
+    return true;
 }

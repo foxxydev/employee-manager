@@ -13,9 +13,14 @@ static const auto requestClass = QStringLiteral(EMPLOYEE_REQUEST_CLASS);
 
 static const auto requestEmployeeListKey =
         QStringLiteral(EMPLOYEE_REQUEST_CLASS "employeeList");
-
 static const auto requestSendMailKey =
         QStringLiteral(EMPLOYEE_REQUEST_CLASS "sendMail");
+
+static const auto dataKey = QStringLiteral("data");
+static const auto usernameKey = QStringLiteral("username");
+static const auto receiverKey = QStringLiteral("receiver");
+static const auto subjectKey = QStringLiteral("subject");
+static const auto messageKey = QStringLiteral("message");
 
 Employee::Employee(QObject *parent) : Request(requestClass, parent)
 {
@@ -56,17 +61,45 @@ bool Employee::requestEmployeeList(const QVariantMap &)
 bool Employee::requestSendMail(const QVariantMap &request)
 {
     MailClient mailClient;
-    auto username="employeemanagerapp@gmail.com";
-    auto receiver="tudor.gosa@gmail.com";
-    auto subject="testing class";
-    auto message="testing 123456789";
 
-    if (mailClient.sendMail(username, receiver, subject, message)){
-        emitCompleted(request, QStringLiteral("Mail sent succesfully!"));
-    } else {
-        emitError(request, QStringLiteral("Error in sending the mail!"));
+
+    if (!request.contains(dataKey)) {
+        emitError(request, QStringLiteral("Request contains no data."));
+        return true;
+    }
+    const auto data = request.value(dataKey).toMap();
+
+    if (!data.contains(usernameKey)) {
+        emitError(request, QStringLiteral("Request is missing username."));
+        return false;
     }
 
+    if (!data.contains(receiverKey)) {
+        emitError(request, QStringLiteral("Request is missing receiver."));
+        return false;
+    }
+
+    if (!data.contains(subjectKey)) {
+        emitError(request, QStringLiteral("Request is missing subject."));
+        return false;
+    }
+
+    if (!data.contains(messageKey)) {
+        emitError(request, QStringLiteral("Request is missing message."));
+        return false;
+    }
+
+    const auto username = data.value(usernameKey).toString();
+    const auto receiver = data.value(receiverKey).toString();
+    const auto subject = data.value(subjectKey).toString();
+    const auto message = data.value(messageKey).toString();
+
+    if (!mailClient.sendMail(username, receiver, subject, message)) {
+        emitError(request, QStringLiteral("Error in sending the mail!"));
+        return false;
+    }
+
+    emitCompleted(request, QStringLiteral("Mail sent succesfully!"));
     return true;
 }
 
