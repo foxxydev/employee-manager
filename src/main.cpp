@@ -6,7 +6,6 @@
 
 #include "Daemon.h"
 #include "Database.h"
-#include "MailClient.h"
 
 int main(int argc, char *argv[])
 {
