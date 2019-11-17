@@ -18,6 +18,7 @@ public:
 
 private:
     bool requestEmployeeList(const QVariantMap &);
+    bool requestSendMail(const QVariantMap &);
 
     typedef bool (Employee::*RequestCallback)(const QVariantMap &);
     static const QHash<QString, RequestCallback> requests;
