@@ -29,7 +29,7 @@ Employee::Employee(QObject *parent) : Request(requestClass, parent)
 bool Employee::match(const QString &request) const
 {
     qCDebug(logRequest).nospace() << "Employee::match(" << request << ")";
-    return true;
+    return request.startsWith(requestClass);;
 }
 
 bool Employee::exec(const QVariantMap &request)
@@ -71,22 +71,22 @@ bool Employee::requestSendMail(const QVariantMap &request)
 
     if (!data.contains(usernameKey)) {
         emitError(request, QStringLiteral("Request is missing username."));
-        return false;
+        return true;
     }
 
     if (!data.contains(receiverKey)) {
         emitError(request, QStringLiteral("Request is missing receiver."));
-        return false;
+        return true;
     }
 
     if (!data.contains(subjectKey)) {
         emitError(request, QStringLiteral("Request is missing subject."));
-        return false;
+        return true;
     }
 
     if (!data.contains(messageKey)) {
         emitError(request, QStringLiteral("Request is missing message."));
-        return false;
+        return true;
     }
 
     const auto username = data.value(usernameKey).toString();
@@ -96,7 +96,7 @@ bool Employee::requestSendMail(const QVariantMap &request)
 
     if (!mailClient.sendMail(username, receiver, subject, message)) {
         emitError(request, QStringLiteral("Error in sending the mail!"));
-        return false;
+        return true;
     }
 
     emitCompleted(request, QStringLiteral("Mail sent succesfully!"));
