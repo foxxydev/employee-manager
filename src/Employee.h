@@ -21,7 +21,7 @@ private:
     bool requestEmployeeList(const QVariantMap &);
     bool requestSendMail(const QVariantMap &);
 
-    Database mDatabase;
+    Database *mDatabase;
     typedef bool (Employee::*RequestCallback)(const QVariantMap &);
     static const QHash<QString, RequestCallback> requests;
 };

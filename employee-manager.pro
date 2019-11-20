@@ -14,8 +14,8 @@ SOURCES += src/main.cpp \
     src/MailClient.cpp \
     src/Request.cpp \
     src/RequestFactory.cpp \
+    src/Smtp.cpp \
     src/User.cpp
-    src/Smtp.cpp
 
 HEADERS += \
     src/Client.h \
@@ -27,5 +27,5 @@ HEADERS += \
     src/Request.h \
     src/RequestFactory.h \
     src/Singleton.h \
+    src/Smtp.h \
     src/User.h
-    src/Smtp.h

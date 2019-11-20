@@ -58,8 +58,6 @@ bool Employee::exec(const QVariantMap &request)
 
 bool Employee::requestEmployeeList(const QVariantMap &request)
 {
-    // [HV] TBI : actual function, not just an always working one :)
-
     if (!request.contains(dataKey)) {
         emitError(request,
                   QStringLiteral("Request contains no data."));
@@ -67,7 +65,6 @@ bool Employee::requestEmployeeList(const QVariantMap &request)
     }
 
     const auto data = request.value(dataKey).toMap();
-    qDebug() << "DATA: " << data;
 
     if (!data.contains(emailKey)) {
         emitError(request,
@@ -91,48 +88,45 @@ bool Employee::requestEmployeeList(const QVariantMap &request)
     const auto startDate = data.value(startDateKey).toString();
     const auto endDate = data.value(endDateKey).toString();
 
+    QVariantMap mailPacket(QVariantMap({
+        {usernameKey, "employeemanagerapp@gmail.com"},
+        {receiverKey, email},
+        {subjectKey, "Annual Leave Request"}
+    }));
+
     if (data.contains(detailsKey)) {
         const auto details = data.value(detailsKey).toString();
-        mDatabase.addNewAnnualLeave(email, startDate, endDate, details);
+        mDatabase->addNewAnnualLeave(email, startDate, endDate, details);
+        mailPacket.insert(messageKey, details);
+    } else {
+        mDatabase->addNewAnnualLeave(email, startDate, endDate);
+        mailPacket.insert(messageKey, "Please accept my annual leave request.");
     }
 
-    mDatabase.addNewAnnualLeave(email, startDate, endDate, details);
-    qDebug() << "All info:\n"
-             << email << "\n"
-             << startDate << "\n"
-             << endDate;
-
-    return true;
+    return requestSendMail(mailPacket);
 }
 
-bool Employee::requestSendMail(const QVariantMap &request)
+bool Employee::requestSendMail(const QVariantMap &data)
 {
     MailClient mailClient;
 
-
-    if (!request.contains(dataKey)) {
-        emitError(request, QStringLiteral("Request contains no data."));
-        return true;
-    }
-    const auto data = request.value(dataKey).toMap();
-
     if (!data.contains(usernameKey)) {
-        emitError(request, QStringLiteral("Request is missing username."));
+        emitError(data, QStringLiteral("Request is missing username."));
         return true;
     }
 
     if (!data.contains(receiverKey)) {
-        emitError(request, QStringLiteral("Request is missing receiver."));
+        emitError(data, QStringLiteral("Request is missing receiver."));
         return true;
     }
 
     if (!data.contains(subjectKey)) {
-        emitError(request, QStringLiteral("Request is missing subject."));
+        emitError(data, QStringLiteral("Request is missing subject."));
         return true;
     }
 
     if (!data.contains(messageKey)) {
-        emitError(request, QStringLiteral("Request is missing message."));
+        emitError(data, QStringLiteral("Request is missing message."));
         return true;
     }
 
@@ -142,11 +136,11 @@ bool Employee::requestSendMail(const QVariantMap &request)
     const auto message = data.value(messageKey).toString();
 
     if (!mailClient.sendMail(username, receiver, subject, message)) {
-        emitError(request, QStringLiteral("Error in sending the mail!"));
+        emitError(data, QStringLiteral("Error in sending the mail!"));
         return true;
     }
 
-    emitCompleted(request, QStringLiteral("Mail sent succesfully!"));
+    emitCompleted(data, QStringLiteral("Mail sent succesfully!"));
     return true;
 }
 
