@@ -12,7 +12,8 @@ SOURCES += src/main.cpp \
     src/Database.cpp \
     src/Employee.cpp \
     src/Request.cpp \
-    src/RequestFactory.cpp
+    src/RequestFactory.cpp \
+    src/User.cpp
 
 HEADERS += \
     src/Client.h \
@@ -22,4 +23,5 @@ HEADERS += \
     src/Employee.h \
     src/Request.h \
     src/RequestFactory.h \
-    src/Singleton.h
+    src/Singleton.h \
+    src/User.h

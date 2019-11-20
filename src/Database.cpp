@@ -27,3 +27,15 @@ Database::Database()
 
     qCDebug(logDatabase) << "The database connection has been successfully established!";
 }
+
+bool Database::addNewAnnualLeave(const QString &email, const QString &startDate, const QString &endDate, const QString &details)
+{
+    QSqlQuery insertQuery;
+
+    if (!insertQuery.exec("INSERT INTO company.tblAnnualLeaves (email, startDate, endDate, details) VALUES('" +
+                          email + "," + startDate + "," + endDate + "," + details + "')")) {
+        return false;
+    }
+
+    return true;
+}

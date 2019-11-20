@@ -3,6 +3,7 @@
 
 #include <QHash>
 
+#include "Database.h"
 #include "Request.h"
 #include "Singleton.h"
 
@@ -19,6 +20,7 @@ public:
 private:
     bool requestEmployeeList(const QVariantMap &);
 
+    Database mDatabase;
     typedef bool (Employee::*RequestCallback)(const QVariantMap &);
     static const QHash<QString, RequestCallback> requests;
 };

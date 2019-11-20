@@ -6,6 +6,7 @@
 #include "Daemon.h"
 
 #include "Employee.h"
+#include "User.h"
 #include "RequestFactory.h"
 
 static QLoggingCategory logDaemon("Daemon", QtCriticalMsg);
@@ -22,6 +23,7 @@ Daemon::Daemon(QObject *parent)
 
     auto factory = RequestFactory::instance();
     factory->registerRequest(new Employee());
+    factory->registerRequest(new User());
 }
 
 /**
