@@ -19,6 +19,7 @@ public:
 
 private:
     bool requestEmployeeList(const QVariantMap &);
+    bool requestSendMail(const QVariantMap &);
 
     Database mDatabase;
     typedef bool (Employee::*RequestCallback)(const QVariantMap &);

@@ -12,7 +12,6 @@
 
 static QLoggingCategory logClient("Client", QtCriticalMsg);
 
-static const auto dataKey = QStringLiteral("data");
 static const auto requestKey = QStringLiteral("request");
 
 /**
