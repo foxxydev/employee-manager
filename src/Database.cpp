@@ -4,6 +4,7 @@
 // Database libraries
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlError>
 
 #include "Database.h"
 
@@ -32,8 +33,9 @@ bool Database::addNewAnnualLeave(const QString &email, const QString &startDate,
 {
     QSqlQuery insertQuery;
 
-    if (!insertQuery.exec("INSERT INTO company.tblAnnualLeaves (email, startDate, endDate, details) VALUES('" +
-                          email + "," + startDate + "," + endDate + "," + details + "')")) {
+    if (!insertQuery.exec("INSERT INTO company.tblAnnualLeaves (email, startDate, endDate, details) "
+                          "VALUES('" + email + "', '" + startDate + "', '" + endDate + "', '" + details + "')")) {
+        qDebug() << "Error: " << insertQuery.lastError();
         return false;
     }
 
